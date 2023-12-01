@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getTasks } from '../../services/TaskService';
 import { ITask } from '../../types/interfaces';
+import { toast } from 'react-toastify';
 
 const TaskList: React.FC = () => {
 	const [tasks, setTasks] = useState<ITask[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchTasks = async () => {
@@ -13,11 +15,33 @@ const TaskList: React.FC = () => {
 				setTasks(fetchedTasks);
 			} catch (error) {
 				console.error('Fehler beim Laden der Aufgaben:', error);
+				toast.error('Aufgaben konnten nicht geladen werden.');
+			} finally {
+				setIsLoading(false);
 			}
 		};
 
 		fetchTasks();
 	}, []);
+
+	if (isLoading) {
+		return <p>Lädt Aufgaben...</p>;
+	}
+
+	if (!tasks.length) {
+		return (
+			<div className="container mt-4">
+				<h2>Aufgabenliste</h2>
+				<p>
+					Es sind keine Aufgaben vorhanden. Erstellen Sie eine neue
+					Aufgabe.
+				</p>
+				<Link to="/create-task" className="btn btn-primary">
+					Neue Aufgabe erstellen
+				</Link>
+			</div>
+		);
+	}
 
 	return (
 		<div className="container mt-4">
@@ -37,7 +61,10 @@ const TaskList: React.FC = () => {
 						</div>
 						<p className="mb-1">{task.description}</p>
 						<small>
-							Fällig am: {task.due_date || 'Kein Datum'}
+							Fällig am:{' '}
+							{task.due_date
+								? new Date(task.due_date).toLocaleDateString()
+								: 'Kein Datum'}
 						</small>
 					</Link>
 				))}

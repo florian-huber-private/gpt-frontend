@@ -5,7 +5,14 @@ import {
 	getTaskDetails,
 	updateTask,
 } from '../../services/TaskService';
-import { ITask, TaskPriority, TaskStatus } from '../../types/interfaces';
+import {
+	ICategory,
+	ITask,
+	TaskPriority,
+	TaskStatus,
+} from '../../types/interfaces';
+import { toast } from 'react-toastify';
+import { getCategories } from '../../services/CategoryService';
 
 const TaskForm: React.FC = () => {
 	const initialTaskState: ITask = {
@@ -21,6 +28,7 @@ const TaskForm: React.FC = () => {
 	};
 
 	const [task, setTask] = useState<ITask>(initialTaskState);
+	const [categories, setCategories] = useState<ICategory[]>([]);
 	const { id } = useParams();
 	const navigate = useNavigate();
 
@@ -41,6 +49,20 @@ const TaskForm: React.FC = () => {
 		}
 	}, [id]);
 
+	useEffect(() => {
+		const fetchCategories = async () => {
+			try {
+				const fetchedCategories = await getCategories();
+				setCategories(fetchedCategories);
+			} catch (error) {
+				console.error('Fehler beim Laden der Kategorien:', error);
+				toast.error('Kategorien konnten nicht geladen werden.');
+			}
+		};
+
+		fetchCategories();
+	}, []);
+
 	const handleChange = (
 		e: React.ChangeEvent<
 			HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -54,12 +76,15 @@ const TaskForm: React.FC = () => {
 		try {
 			if (id) {
 				await updateTask(parseInt(id), task);
+				toast.success('Aufgabe erfolgreich aktualisiert!');
 			} else {
 				await createTask(task);
+				toast.success('Aufgabe erfolgreich erstellt!');
 			}
 			navigate('/tasks');
-		} catch (error) {
+		} catch (error: unknown) {
 			console.error('Fehler beim Speichern der Aufgabe:', error);
+			toast.error('Fehler beim Speichern der Aufgabe.');
 		}
 	};
 
@@ -143,6 +168,25 @@ const TaskForm: React.FC = () => {
 						<option value="TODO">To Do</option>
 						<option value="IN_PROGRESS">In Progress</option>
 						<option value="COMPLETED">Completed</option>
+					</select>
+				</div>
+
+				<div className="mb-3">
+					<label htmlFor="category" className="form-label">
+						Kategorie
+					</label>
+					<select
+						className="form-select"
+						id="category"
+						name="category_id"
+						value={task.category_id || ''}
+						onChange={handleChange}>
+						<option value="">Keine Kategorie</option>
+						{categories.map((category) => (
+							<option key={category.id} value={category.id}>
+								{category.name}
+							</option>
+						))}
 					</select>
 				</div>
 

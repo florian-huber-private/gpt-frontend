@@ -3,22 +3,46 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/AuthService';
 import { useAuth } from '../../context/AuthContext';
 import { IUser } from '../../types/interfaces';
+import { toast } from 'react-toastify';
 
 const LoginPage: React.FC = () => {
 	const [username, setUsername] = useState<IUser['username']>('');
 	const [password, setPassword] = useState<string>('');
+	const [loading, setLoading] = useState<boolean>(false);
 	const navigate = useNavigate();
 	const { login: doLogin } = useAuth();
 
+	const validateForm = () => {
+		if (!username.trim()) {
+			toast.error('Bitte geben Sie einen Benutzernamen ein.');
+			return false;
+		}
+
+		if (!password) {
+			toast.error('Bitte geben Sie ein Passwort ein.');
+			return false;
+		}
+
+		return true;
+	};
+
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
+		if (!validateForm()) return;
+
+		setLoading(true); // Start loading state
 		try {
 			const response = await login(username, password);
-			console.log('Login erfolgreich:', response);
-			doLogin(); // Authentifizierungsstatus aktualisieren
+			toast.success('Login erfolgreich!');
+			doLogin(response.user); // Authentifizierungsstatus aktualisieren
 			navigate('/profile');
-		} catch (error) {
-			console.error('Fehler beim Login:', error);
+		} catch (error: any) {
+			// Hier wird der Typ `any` verwendet, um auf die Eigenschaften des Fehlers zugreifen zu können.
+			setLoading(false); // Stop loading state
+			const errorMessage =
+				error.response?.data?.message ||
+				'Login fehlgeschlagen: Bitte überprüfen Sie Ihre Anmeldeinformationen.';
+			toast.error(errorMessage);
 		}
 	};
 
@@ -51,7 +75,7 @@ const LoginPage: React.FC = () => {
 					/>
 				</div>
 				<button type="submit" className="btn btn-primary">
-					Anmelden
+					{loading ? 'Lädt...' : 'Anmelden'}
 				</button>
 			</form>
 		</div>

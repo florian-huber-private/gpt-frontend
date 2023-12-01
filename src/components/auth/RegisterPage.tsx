@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../../services/AuthService';
 import { IUser } from '../../types/interfaces';
+import { toast } from 'react-toastify';
 
 const RegisterPage: React.FC = () => {
 	const [username, setUsername] = useState<IUser['username']>('');
@@ -11,12 +12,37 @@ const RegisterPage: React.FC = () => {
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
+
+		if (!username.trim()) {
+			toast.error('Bitte geben Sie einen Benutzernamen ein.');
+			return;
+		}
+
+		const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+		if (!emailRegex.test(email)) {
+			toast.error('Bitte geben Sie eine gültige E-Mail-Adresse ein.');
+			return;
+		}
+
+		const passwordRegex = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z]).{8,}$/;
+		if (!passwordRegex.test(password)) {
+			toast.error(
+				'Das Passwort muss mindestens 8 Zeichen lang sein und Zahlen, Groß- und Kleinbuchstaben enthalten.'
+			);
+			return;
+		}
+
 		try {
-			const response = await register(username, email, password);
-			console.log('Registrierung erfolgreich:', response);
+			await register(username, email, password);
+			toast.success('Registrierung erfolgreich!');
 			navigate('/login');
-		} catch (error) {
+		} catch (error: unknown) {
 			console.error('Fehler bei der Registrierung:', error);
+			let errorMessage = 'Fehler bei der Registrierung.';
+			if (error instanceof Error && error.message) {
+				errorMessage = error.message; // oder eine andere Logik zur Anzeige von Fehlermeldungen
+			}
+			toast.error(errorMessage);
 		}
 	};
 

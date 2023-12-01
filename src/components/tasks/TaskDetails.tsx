@@ -2,24 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getTaskDetails } from '../../services/TaskService';
 import { ITask } from '../../types/interfaces';
+import { toast } from 'react-toastify';
 
 const TaskDetails: React.FC = () => {
 	const [task, setTask] = useState<ITask | null>(null);
 	const { id } = useParams<{ id: string }>();
 
 	useEffect(() => {
+		const fetchTaskDetails = async () => {
+			try {
+				const fetchedTask = await getTaskDetails(parseInt(id!));
+				setTask(fetchedTask);
+			} catch (error) {
+				console.error('Fehler beim Laden der Aufgabendetails:', error);
+				toast.error('Aufgabendetails konnten nicht geladen werden.');
+			}
+		};
+
 		if (id) {
-			const fetchTaskDetails = async () => {
-				try {
-					const fetchedTask = await getTaskDetails(parseInt(id));
-					setTask(fetchedTask);
-				} catch (error) {
-					console.error(
-						'Fehler beim Laden der Aufgabendetails:',
-						error
-					);
-				}
-			};
 			fetchTaskDetails();
 		}
 	}, [id]);
@@ -40,9 +40,14 @@ const TaskDetails: React.FC = () => {
 					<p className="card-text">{task.description}</p>
 					<p className="card-text">
 						<small className="text-muted">
-							Fällig am: {task.due_date || 'Kein Datum'}
+							Fällig am:{' '}
+							{task.due_date
+								? new Date(task.due_date).toLocaleDateString()
+								: 'Kein Datum'}
 						</small>
 					</p>
+					<p className="card-text">Status: {task.status}</p>
+					{/* Optional: Anzeige der Kategorie, wenn verfügbar */}
 					<Link to={`/edit-task/${id}`} className="card-link">
 						Bearbeiten
 					</Link>
