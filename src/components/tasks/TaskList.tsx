@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getTasks } from '../../services/TaskService';
+import { ITask } from '../../types/interfaces';
 
 const TaskList: React.FC = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<ITask[]>([]);
 
   useEffect(() => {
     const fetchTasks = async () => {

@@ -1,14 +1,7 @@
 import axios from 'axios';
+import { AuthResponse } from '../types/interfaces';
 
 const API_URL = 'http://127.0.0.1:5000/auth';
-
-interface AuthResponse {
-  token: string;
-  user: {
-    username: string;
-    email: string;
-  };
-}
 
 export const login = async (username: string, password: string): Promise<AuthResponse> => {
   const response = await axios.post(`${API_URL}/login`, { username, password });
