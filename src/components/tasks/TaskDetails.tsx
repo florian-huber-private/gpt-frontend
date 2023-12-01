@@ -22,16 +22,21 @@ const TaskDetails: React.FC = () => {
   }, [id]);
 
   if (!task) {
-    return <p>Laden...</p>;
+    return <div className="container mt-4">Laden...</div>;
   }
 
   return (
-    <div>
+    <div className="container mt-4">
       <h2>Aufgabendetails</h2>
-      <p>Titel: {task.title}</p>
-      <p>Beschreibung: {task.description}</p>
-      <p>Priorität: {task.priority}</p>
-      <Link to={`/edit-task/${id}`}>Bearbeiten</Link>
+      <div className="card">
+        <div className="card-body">
+          <h5 className="card-title">{task.title}</h5>
+          <h6 className="card-subtitle mb-2 text-muted">Priorität: {task.priority}</h6>
+          <p className="card-text">{task.description}</p>
+          <p className="card-text"><small className="text-muted">Fällig am: {task.due_date || 'Kein Datum'}</small></p>
+          <Link to={`/edit-task/${id}`} className="card-link">Bearbeiten</Link>
+        </div>
+      </div>
     </div>
   );
 };
