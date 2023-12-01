@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import HomePage from './components/HomePage';
 import LoginPage from './components/auth/LoginPage';
@@ -15,19 +15,19 @@ const App: React.FC = () => {
   return (
     <Router>
       <Navbar />
-      <Switch>
-        <Route path="/" exact component={HomePage} />
-        <Route path="/login" component={LoginPage} />
-        <Route path="/register" component={RegisterPage} />
-        <Route path="/profile" component={UserProfile} />
-        <Route path="/tasks" component={TaskList} />
-        <Route path="/task/:id" component={TaskDetails} />
-        <Route path="/create-task" component={TaskForm} />
-        <Route path="/edit-task/:id" component={TaskForm} />
-        <Route path="/categories" component={CategoryList} />
-        <Route path="/create-category" component={CategoryForm} />
-        <Route path="/edit-category/:id" component={CategoryForm} />
-      </Switch>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/tasks" element={<TaskList />} />
+        <Route path="/task/:id" element={<TaskDetails />} />
+        <Route path="/create-task" element={<TaskForm />} />
+        <Route path="/edit-task/:id" element={<TaskForm />} />
+        <Route path="/categories" element={<CategoryList />} />
+        <Route path="/create-category" element={<CategoryForm />} />
+        <Route path="/edit-category/:id" element={<CategoryForm />} />
+      </Routes>
     </Router>
   );
 }
