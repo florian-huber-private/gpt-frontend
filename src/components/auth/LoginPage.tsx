@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../../services/AuthService';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Implementieren Sie hier die Logik zur Authentifizierung
-    console.log('Login:', username, password);
-    // Nach erfolgreicher Anmeldung, navigieren Sie zum Profil oder einer anderen Seite
-    navigate('/profile');
+    try {
+      const response = await login(username, password);
+      console.log('Login erfolgreich:', response);
+      navigate('/profile');
+    } catch (error) {
+      console.error('Fehler beim Login:', error);
+      // Hier könnten Sie einen Fehlerhinweis anzeigen
+    }
   };
 
   return (

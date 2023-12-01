@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../../services/AuthService';
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -7,12 +8,16 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Implementieren Sie hier die Logik zur Registrierung
-    console.log('Register:', username, email, password);
-    // Nach erfolgreicher Registrierung, navigieren Sie zur Anmeldeseite oder einer anderen Seite
-    navigate('/login');
+    try {
+      const response = await register(username, email, password);
+      console.log('Registrierung erfolgreich:', response);
+      navigate('/login');
+    } catch (error) {
+      console.error('Fehler bei der Registrierung:', error);
+      // Hier könnten Sie einen Fehlerhinweis anzeigen
+    }
   };
 
   return (
